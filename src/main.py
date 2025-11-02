@@ -1,6 +1,7 @@
 import argparse
 import sys
 import time
+from pathlib import Path
 
 try:
     import cv2
@@ -20,7 +21,10 @@ def run(camera_index: int, output_path: str, display: bool, min_stable_frames: i
         sys.exit(1)
 
     detector = GestureDetector()
-    logger = EventLogger(output_path)
+    # Always write logs under tst/results, using only the filename component
+    results_dir = Path("tst") / "results"
+    out_file = results_dir / Path(output_path).name
+    logger = EventLogger(out_file)
 
     last_detected = None
     stable_count = 0
@@ -75,7 +79,7 @@ def run(camera_index: int, output_path: str, display: bool, min_stable_frames: i
 def main():
     parser = argparse.ArgumentParser(description="Hand gesture recognition: START (thumbs up), STOP (open palm), numbers 1-5")
     parser.add_argument("--camera", type=int, default=0, help="Camera index (default 0)")
-    parser.add_argument("--output", type=str, default="recognized_gestures.txt", help="Path to the output .txt log file")
+    parser.add_argument("--output", type=str, default="recognized_gestures.txt", help="Name of the output .txt log file (saved under tst/results)")
     parser.add_argument("--no-display", action="store_true", help="Disable UI display window")
     parser.add_argument("--stable-frames", type=int, default=5, help="Frames a gesture must persist before logging")
     args = parser.parse_args()
@@ -85,4 +89,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
